@@ -74,10 +74,10 @@ function attackPrepUrl(unitCounts, targetVillageId, originVillageId = window.gam
     let uriParams = {
         from: 'simulator',
         village: originVillageId,
-        target_village_id: targetVillageId        
+        target: targetVillageId        
     };
     for (let [unitType, count] of Object.entries(unitCounts)) {
-        uriParams['att_' + unitType] = count;
+        uriParams[unitType] = count;
     }
     return gameUrl('place', uriParams);
 }
