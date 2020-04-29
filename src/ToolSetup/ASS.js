@@ -96,7 +96,7 @@ function insertPreferencesLauncher() {
 
 
 function insertNarcissim() {
-    let $narcissism = $(`<span>Script created by <a href="https://forum.tribalwars.net/index.php?members/28484">cheesasaurus</a></span>`)
+    let $narcissism = $(`<span>Script created by <a href="https://forum.tribalwars.net/index.php?members/28484">cheesasaurus</a> and modified by Jopika</span>`)
         .css({
             float: 'right',
             fontSize: 'xx-small',

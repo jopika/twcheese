@@ -72,7 +72,7 @@ function gameUrl(screen, uriParams, method = 'GET') {
 
 function attackPrepUrl(unitCounts, targetVillageId, originVillageId = window.game_data.village.id) {
     let uriParams = {
-        from: 'simulator',
+        from: 'reports',
         village: originVillageId,
         target: targetVillageId        
     };
