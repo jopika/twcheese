@@ -17,7 +17,7 @@ class ReportSelector {
 
     selectNew() {
         this.widget.selectMatchingReports((report) => {
-            console.log(`Report: ${JSON.stringify(report)} and reportIsNew ${report.isNew}`);
+            // console.log(`Report: ${JSON.stringify(report)} and reportIsNew ${report.isNew}`);
             return report.isNew;
         });
     }
