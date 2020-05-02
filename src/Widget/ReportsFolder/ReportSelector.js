@@ -16,8 +16,10 @@ class ReportSelector {
     }
 
     selectNew() {
-        console.log(`Report: ${JSON.stringify(report)} and reportIsNew ${report.isNew}`);
-        this.widget.selectMatchingReports(report => report.isNew);
+        this.widget.selectMatchingReports((report) => {
+            console.log(`Report: ${JSON.stringify(report)} and reportIsNew ${report.isNew}`);
+            return report.isNew;
+        });
     }
 
     selectOld() {
