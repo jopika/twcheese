@@ -96,7 +96,7 @@ function insertPreferencesLauncher() {
 
 
 function insertNarcissim() {
-    let $narcissism = $(`<span>Script created by <a href="https://forum.tribalwars.net/index.php?members/28484">cheesasaurus</a> and modified by Jopika</span>`)
+    let $narcissism = $(`<span>Script created by <a href="https://forum.tribalwars.net/index.php?members/28484">cheesasaurus</a> and maintained by <a target="_blank" href="https://www.github.com/Jopika">Jopika</a></span>`)
         .css({
             float: 'right',
             fontSize: 'xx-small',
@@ -110,7 +110,7 @@ function insertNarcissim() {
 function openPreferencesPopup() {
     let onClose = prepareBestOption;
 
-    Dialog.show('twcheese-scavenge-preferences-popup', function($container) {        
+    Dialog.show('twcheese-scavenge-preferences-popup', function($container) {
         let widget = new ScavengePreferencesWidget(troopsAssigner.preferences, scavengeOptions, troopsAssigner.sendableTroopTypes);
         widget.appendTo($container);
     }, onClose);
@@ -123,7 +123,7 @@ function prepareBestOption(informUserOfIssues = true) {
     if (usableOptionIds.length < 1) {
         if (informUserOfIssues) {
             window.UI.ErrorMessage(`Can't scavenge right now because there's no usable options`);
-        }        
+        }
         return;
     }
 
@@ -134,7 +134,7 @@ function prepareBestOption(informUserOfIssues = true) {
         }
         return;
     }
-    
+
     let assignedTroopsByOption = troopsAssigner.assignTroops(usableOptionIds, availableTroops, haulFactor);
 
     let optionId = usableOptionIds[usableOptionIds.length - 1];
@@ -166,7 +166,7 @@ function afterScavengingStarted(doSomething) {
             }
         });
     });
-    
+
     $('.scavenge-option').each(function() {
         observer.observe(this, {
             childList: true,

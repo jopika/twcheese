@@ -8,8 +8,8 @@ import { userConfig } from '/twcheese/src/Util/Config.js';
 class HaulStatsWidget extends AbstractWidget {
 
     /**
-     * @param {Command[]} commands 
-     * @param {int|null} pageNumber 
+     * @param {Command[]} commands
+     * @param {int|null} pageNumber
      */
     constructor(commands, pageNumber) {
         super();
@@ -41,16 +41,16 @@ class HaulStatsWidget extends AbstractWidget {
         let latestCommandArrival;
         if (this.commands.length > 0) {
             latestCommandArrival = this.commands[this.commands.length - 1].arrival;
-        }        
-    
+        }
+
         while (startOfHour < latestCommandArrival) {
             let endOfHour = startOfHour.endOfHour();
             let hourOfDay = startOfHour.getServerHours();
             let dayHint = this.dayHint(startOfHour);
-    
+
             summationFromOptions.push(`<option value=${startOfHour.getTime()}>${hourOfDay}:00 ${dayHint}</option>`);
             summationToOptions.push(`<option value="${endOfHour.getTime()}">${hourOfDay}:59 ${dayHint}</option>`);
-    
+
             let result = Command.sumPropsFromTimeframe(this.commands, startOfHour, endOfHour);
             hourlyBreakdowns.push(`
                 <tr>
@@ -62,23 +62,23 @@ class HaulStatsWidget extends AbstractWidget {
                     <td>${result.calcHaulPercent()}%</td>
                 </tr>
             `);
-    
+
             startOfHour = startOfHour.addHours(1);
         }
 
         let pageInfo = this.pageNumber ? `from Page ${this.pageNumber}` : '';
-    
+
         let collapsed = userConfig.get('HaulStatsWidget.collapseStats', false);
         let toggleIconSrc = collapsed ? ImageSrc.plus : ImageSrc.minus;
         let contentDisplay = collapsed ? 'none' : 'block';
-    
+
         return `
             <div id="twcheese_pillaging_stats" class="vis widget">
                 <h4>
                     Pillaging Statistics
                     <img id="twcheese_pillaging_stats_toggle" src="${toggleIconSrc}" style="float:right; cursor: pointer;">
                     <span style="font-size: 10px; font-style: normal; font-weight: normal; margin-right: 25px; float: right;">
-                        created by <a target="_blank" href="https://forum.tribalwars.net/index.php?members/28484/">cheesasaurus</a>
+                        created by <a target="_blank" href="https://forum.tribalwars.net/index.php?members/28484/">cheesasaurus</a> and maintained by <a target="_blank" href="https://www.github.com/Jopika">Jopika</a>
                     </span>
                 </h4>
                 <div id="twcheese_pillaging_stats_content" style="display: ${contentDisplay};">

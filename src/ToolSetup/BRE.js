@@ -45,7 +45,6 @@ async function useTool() {
         }
     }
 
-
     else {
         alert('try using this on:\n1) a battle report\n2) a reports folder, with the "Attacks" filter on\n3) a reports folder, with the "Defenses" filter on');
     }
