@@ -4,7 +4,7 @@ import { AbstractWidget } from '/twcheese/src/Widget/AbstractWidget.js';
 
 class ReportSelectorWidget extends AbstractWidget {
     /**
-     * @param {ReportSelector} reportSelector 
+     * @param {ReportSelector} reportSelector
      */
     constructor(reportSelector) {
         super();
@@ -51,6 +51,10 @@ class ReportSelectorWidget extends AbstractWidget {
             ['old', {
                 click: () => reportSelector.selectOld(),
                 html: 'old'
+            }],
+            ['unconverted', {
+                click: () => reportSelector.selectUnconverted(),
+                html: 'unconverted'
             }],
             ['dotGreen', {
                 click: () => reportSelector.selectDotColor('green'),
@@ -113,7 +117,7 @@ class ReportSelectorWidget extends AbstractWidget {
 
             let cell = selectorClickyTable.rows[0].insertCell(-1);
             cell.style.width = '25px';
-            cell.style.textAlign = 'center';        
+            cell.style.textAlign = 'center';
             cell.appendChild(optionEl);
         }
 

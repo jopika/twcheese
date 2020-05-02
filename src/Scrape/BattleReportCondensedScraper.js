@@ -47,6 +47,7 @@ class BattleReportCondensedScraper {
         report.isForwarded = !!reportIcons.find(img => img.src.includes('graphic/forwarded.png'));
         // report.isNew = $(row.cells[1]).text().trim().endsWith(textScraper.t('report.unread'));
         report.isNew = row.classList.contains(`unread`);
+        report.unconverted = row.cells[1].querySelector(`.quickedit-label`).innerText.trim().startsWith(`twCheese`);
         report.strTimeReceived = row.cells[2].innerHTML;
         report.haulStatus = this.determineHaulStatus(reportIcons);
         report.attackIcons = this.attackIconsScraper.scrapeIcons(reportIcons);

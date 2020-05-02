@@ -22,6 +22,12 @@ class ReportSelector {
         });
     }
 
+    selectUnconverted() {
+        this.widget.selectMatchingReports((report) => {
+            return report.unconverted;
+        });
+    }
+
     selectOld() {
         this.widget.selectMatchingReports(report => !report.isNew);
     }
