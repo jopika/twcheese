@@ -56,7 +56,8 @@ function initBRE() {
     /*==== contact information ====*/
     var narcismDiv = document.createElement('div');
     document.getElementById('content_value').insertBefore(narcismDiv, document.getElementById('content_value').firstChild);
-    narcismDiv.innerHTML = 'BRE created by <a href="https://forum.tribalwars.net/index.php?members/28484">cheesasaurus</a>';
+    narcismDiv.innerHTML = 'BRE created by <a href="https://forum.tribalwars.net/index.php?members/28484">cheesasaurus</a>' +
+      ' and maintained by <a target="_blank" href="https://www.github.com/Jopika">Jopika</a>';
     narcismDiv.style.fontSize = '10px';
 
     /*==== help ====*/
