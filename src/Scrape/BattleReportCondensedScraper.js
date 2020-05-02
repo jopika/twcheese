@@ -7,12 +7,12 @@ import { AttackIconsScraper } from '/twcheese/src/Scrape/AttackIconsScraper.js';
  * scrapes listed reports from
  *     - game.php?screen=report&mode=attack
  *     - game.php?screen=report&mode=defense
- * 
+ *
  */
 class BattleReportCondensedScraper {
 
     /**
-     * @param {ReportRenamer} reportRenamer 
+     * @param {ReportRenamer} reportRenamer
      */
     constructor(reportRenamer) {
         this.reportRenamer = reportRenamer;
@@ -45,6 +45,7 @@ class BattleReportCondensedScraper {
         report.reportId = parseInt(reportLink.href.match(/view=(\d+)/)[1]);
         report.dotColor = reportIcons.find(img => img.src.includes('graphic/dots/')).src.match(/dots\/(.+).png/)[1];
         report.isForwarded = !!reportIcons.find(img => img.src.includes('graphic/forwarded.png'));
+        console.log(`Report Row: ${JSON.stringify(row)}`);
         report.isNew = $(row.cells[1]).text().trim().endsWith(textScraper.t('report.unread'));
         report.strTimeReceived = row.cells[2].innerHTML;
         report.haulStatus = this.determineHaulStatus(reportIcons);
@@ -67,7 +68,7 @@ class BattleReportCondensedScraper {
         if (lootImg.src.includes('max_loot/0.png')) {
             return BattleReportCondensed.HAUL_STATUS_PARTIAL;
         }
-        return BattleReportCondensed.HAUL_STATUS_FULL;        
+        return BattleReportCondensed.HAUL_STATUS_FULL;
     }
 
 }
