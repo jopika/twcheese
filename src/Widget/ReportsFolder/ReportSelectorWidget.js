@@ -74,7 +74,8 @@ class ReportSelectorWidget extends AbstractWidget {
             }],
             ['forwarded', {
                 click: () => reportSelector.selectForwarded(),
-                html: imgHtml('graphic/forwarded.png')
+                html: imgHtml('graphic/forwarded.png'),
+                tooltip: 'forwarded report'
             }],
             ['haulPartial', {
                 click: () => reportSelector.selectLoot(BattleReportCondensed.HAUL_STATUS_PARTIAL),

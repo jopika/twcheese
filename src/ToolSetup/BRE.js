@@ -29,13 +29,23 @@ async function useTool() {
             reportEnhanced = true;
         }
     }
-    else if (game_data.screen == 'report' && (game_data.mode == 'attack' || game_data.mode == 'defense')) {
+    else if ((game_data.screen == 'report' && (game_data.mode == 'attack' || game_data.mode == 'defense'))) {
         // user is viewing reports folder with 'Attacks' or "Defenses" filter on
         if (!reportsFolderEnhanced) {
             enhanceReportsFolder();
             reportsFolderEnhanced = true;
         }
     }
+    else if (document.URL.includes(`screen=report`) && (document.URL.includes(`mode=attack`) || document.URL.includes(`mode=defense`))) {
+        // user is viewing reports folder with 'Attacks' or "Defenses" filter on
+        console.warn(`BRE: Reached here because game_data was not set properly: ${game_data}`);
+        if (!reportsFolderEnhanced) {
+            enhanceReportsFolder();
+            reportsFolderEnhanced = true;
+        }
+    }
+
+
     else {
         alert('try using this on:\n1) a battle report\n2) a reports folder, with the "Attacks" filter on\n3) a reports folder, with the "Defenses" filter on');
     }
@@ -83,7 +93,7 @@ function enhanceReportsFolder() {
 
     let oldReportsList = document.getElementById('report_list');
     let reportsForm = oldReportsList.parentNode;
-  
+
     // scrape listed reports
     let reportScraper = new BattleReportCondensedScraper(renamer);
     let reports = new Map();
