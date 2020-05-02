@@ -16,6 +16,7 @@ class ReportSelector {
     }
 
     selectNew() {
+        console.log(`Report: ${JSON.stringify(report)} and reportIsNew ${report.isNew}`);
         this.widget.selectMatchingReports(report => report.isNew);
     }
 
@@ -101,7 +102,7 @@ class ReportSelector {
             if (!report.defenderVillage) {
                 return false;
             }
-            
+
             return report.defenderVillage.x === x
                 && report.defenderVillage.y === y;
         });
