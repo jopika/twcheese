@@ -46,6 +46,7 @@ class BattleReportCondensedScraper {
         report.dotColor = reportIcons.find(img => img.src.includes('graphic/dots/')).src.match(/dots\/(.+).png/)[1];
         report.isForwarded = !!reportIcons.find(img => img.src.includes('graphic/forwarded.png'));
         console.log(`Report Row: ${JSON.stringify(row)}`);
+        console.log(`Report Cells: ${JSON.stringify(...row.cells)}`);
         report.isNew = $(row.cells[1]).text().trim().endsWith(textScraper.t('report.unread'));
         report.strTimeReceived = row.cells[2].innerHTML;
         report.haulStatus = this.determineHaulStatus(reportIcons);
