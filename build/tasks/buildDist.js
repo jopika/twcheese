@@ -19,7 +19,7 @@ let stagingDir = `${ROOT}/temp/webpack/`;
 function compileToolSetup(done) {
     fs.readdir(`${ROOT}/src/ToolSetup`, function(err, items) {
         let webpackConfigs = [];
-        for (item of items) {
+        for (let item of items) {
             if (item === 'Sidebar.js') {
                 continue;
             }

@@ -15,7 +15,7 @@ const config = require('../tasks.config.js');
 function compileToolSetup(done) {
     fs.readdir(`${ROOT}/src/ToolSetup`, function(err, items) {
         let webpackConfigs = [];
-        for (item of items) {
+        for (let item of items) {
             webpackConfigs.push({
                 entry: path.resolve(`${ROOT}/src/ToolSetup`, item),
                 output: {

@@ -3,10 +3,10 @@
 // This file is just for reference,
 // to help you make things look/swim/quack like a duck.
 
-import { Phase } from '/twcheese/src/Models/Debug/Phase.js';
-
+// @ts-ignore
+import { Phase } from './Phase';
 
 interface IThingToFollowUpOn {
     followUpPhases: Array<Phase>;
-    addFollowUp(phase: Phase);
+    addFollowUp(phase: Phase): any;
 }

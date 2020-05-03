@@ -8,7 +8,7 @@ import { gameConfig } from '/twcheese/src/Util/Config.js';
  * @param {Date} timeNow
  * @param {Village|{x:number, y:number}} home
  * @param {Village} target
- * @return {{loyaltyNow:Number, loyatyAtArrival:Number}}
+ * @return {{loyaltyNow: number, loyaltyAtArrival: number}}
  */
 function calcLoyalty(reportedLoyalty, timeReported, timeNow, home, target) {
     if (reportedLoyalty <= 0) {

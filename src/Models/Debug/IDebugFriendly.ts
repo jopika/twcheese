@@ -5,7 +5,7 @@
 
 
 interface IDebugFriendly {
-    valueOf(); // Object.prototype.valueOf
+    valueOf(): any; // Object.prototype.valueOf
     toDebugString(): string;
     imageSrc(): string;
 }
