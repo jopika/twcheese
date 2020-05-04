@@ -1,10 +1,11 @@
 class NumberDescriber {
-    describeEven() {
-        return 'Even Steven';
-    }
-    describeOdd() {
-        return 'Odd Todd';
-    }
+  describeEven() {
+    return 'Even Steven';
+  }
+
+  describeOdd() {
+    return 'Odd Todd';
+  }
 }
 
-export { NumberDescriber };
+export {NumberDescriber};

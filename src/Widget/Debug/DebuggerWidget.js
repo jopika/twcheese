@@ -1,35 +1,35 @@
-import { AbstractWidget } from '/twcheese/src/Widget/AbstractWidget.js';
-import { initCss } from '/twcheese/src/Util/UI.js';
-import { DebugEvents } from '/twcheese/src/Models/Debug/DebugEvents.js';
-import { PhaseTypes } from '/twcheese/src/Models/Debug/PhaseTypes.js';
-import { QuestionWidget } from '/twcheese/src/Widget/Debug/QuestionWidget.js';
-import { AttemptWidget } from '/twcheese/src/Widget/Debug/AttemptWidget.js';
-import { ReportWidget } from '/twcheese/src/Widget/Debug/ReportWidget.js';
+import {AbstractWidget} from '../../../src/Widget/AbstractWidget.js';
+import {initCss} from '../../../src/Util/UI.js';
+import {DebugEvents} from '../../../src/Models/Debug/DebugEvents.js';
+import {PhaseTypes} from '../../../src/Models/Debug/PhaseTypes.js';
+import {QuestionWidget} from '../../../src/Widget/Debug/QuestionWidget.js';
+import {AttemptWidget} from '../../../src/Widget/Debug/AttemptWidget.js';
+import {ReportWidget} from '../../../src/Widget/Debug/ReportWidget.js';
 
 
 class DebuggerWidget extends AbstractWidget {
-    constructor() {
-        super();
-        this.initStructure();
-        this.watchSelf();
-        this.watchGlobal();
-        this.process = null;
-    }
+  constructor() {
+    super();
+    this.initStructure();
+    this.watchSelf();
+    this.watchGlobal();
+    this.process = null;
+  }
 
-    initStructure() {
-        this.$el = $(this.createHtml().trim());
-        this.$header = this.$el.find('.twcheese-debugger-header');
-        this.$content = this.$el.find('.twcheese-debugger-content');
-        this.$nav = this.$el.find('.twcheese-debugger-nav');
-        this.$next = this.$el.find('.twcheese-debugger-next');        
-        this.$processName = this.$el.find('.twcheese-debugger-process-name');
-        this.$inspector = this.$el.find('.twcheese-debugger-inspector');
-        this.$iframe = this.$inspector.find('iframe');
-        this.$iframeOverlay = this.$inspector.find('.iframe-overlay');
-    }
+  initStructure() {
+    this.$el = $(this.createHtml().trim());
+    this.$header = this.$el.find('.twcheese-debugger-header');
+    this.$content = this.$el.find('.twcheese-debugger-content');
+    this.$nav = this.$el.find('.twcheese-debugger-nav');
+    this.$next = this.$el.find('.twcheese-debugger-next');
+    this.$processName = this.$el.find('.twcheese-debugger-process-name');
+    this.$inspector = this.$el.find('.twcheese-debugger-inspector');
+    this.$iframe = this.$inspector.find('iframe');
+    this.$iframeOverlay = this.$inspector.find('.iframe-overlay');
+  }
 
-    createHtml() {
-        return `
+  createHtml() {
+    return `
             <div class="twcheese-debugger">
                 <div>
                     <div class="twcheese-debugger-header">
@@ -47,125 +47,132 @@ class DebuggerWidget extends AbstractWidget {
                 </div>
             </div>
         `;
+  }
+
+  watchSelf() {
+    this.$next.on('click', () => {
+      this.process.goToNextPhase();
+    });
+  }
+
+  watchGlobal() {
+    $(window).on('resize', () => this.updateScrolling());
+  }
+
+  startProcessForLastUsedToolIfSensible() {
+    if (this.process) {
+      return;
+    }
+    this.startProcess(window.TwCheese.newDebugProcess(TwCheese.lastToolUsedId));
+  }
+
+  startProcess(process) {
+    this.$next.hide();
+    this.process = process;
+    this.$processName.text(process.name);
+
+    $(process).on(DebugEvents.PHASE_COMPLETION_READY, () => {
+      if (this.process.hasNextPhase()) {
+        this.$next.show();
+      }
+    });
+    $(process).on(DebugEvents.PHASE_COMPLETION_NOT_READY, () => {
+      this.$next.hide();
+    });
+    $(process).on(DebugEvents.PHASE_CHANGED, () => {
+      this.renderCurrentPhase();
+    });
+
+    process.start();
+  }
+
+  renderCurrentPhase() {
+    this.$inspector.hide();
+    this.$content.html('');
+    if (!this.process.hasNextPhase()) {
+      this.$next.hide();
     }
 
-    watchSelf() {
-        this.$next.on('click', () => {
-            this.process.goToNextPhase();
-        });
+    let phase = this.process.getCurrentPhase();
+
+    switch (phase.getType()) {
+      case PhaseTypes.QUESTION:
+        this._renderPhaseQuestion(phase);
+        break;
+      case PhaseTypes.ATTEMPT:
+        this._renderPhaseAttempt(phase);
+        break;
+      case PhaseTypes.REPORT:
+        this._renderPhaseReport(phase);
+        break;
+      default:
+        throw Error('unrecognized phase');
     }
 
-    watchGlobal() {
-        $(window).on('resize', () => this.updateScrolling());
+    setTimeout(() => this.updateScrolling(), 200);
+    $(this).trigger('change');
+  }
+
+  _renderPhaseQuestion(phase) {
+    for (let question of phase.questions) {
+      (new QuestionWidget(question)).appendTo(this.$content);
+    }
+    if (typeof phase.examinedHtml === 'string') {
+      this.openInspector(phase.examinedHtml);
+    }
+  }
+
+  _renderPhaseAttempt(phase) {
+    let widget = (new AttemptWidget(phase)).appendTo(this.$content);
+    $(widget).on('change', () => this.updateScrolling());
+  }
+
+  _renderPhaseReport(phase) {
+    (new ReportWidget(phase)).appendTo(this.$content);
+  }
+
+  updateScrolling() {
+    // https://github.com/rochal/jQuery-slimScroll/issues/16
+    if (this.$content.parent('.slimScrollDiv').size() > 0) {
+      this.$content.parent().replaceWith(this.$content);
+      this.$content.height('auto');
     }
 
-    startProcessForLastUsedToolIfSensible() {
-        if (this.process) {
-            return;
-        }
-        this.startProcess(window.TwCheese.newDebugProcess(TwCheese.lastToolUsedId));
-    }
+    let availableVert = this.$el.innerHeight() - this.$header.outerHeight() - this.$nav.outerHeight();
 
-    startProcess(process) {
-        this.$next.hide();
-        this.process = process;
-        this.$processName.text(process.name);
-        
-        $(process).on(DebugEvents.PHASE_COMPLETION_READY, () => {
-            if (this.process.hasNextPhase()) {
-                this.$next.show();
-            }
-        });
-        $(process).on(DebugEvents.PHASE_COMPLETION_NOT_READY, () => {
-            this.$next.hide();
-        });
-        $(process).on(DebugEvents.PHASE_CHANGED, () => {
-            this.renderCurrentPhase();
-        });
+    this.$content.slimScroll({
+      height: Math.min(availableVert, this.$content.outerHeight()),
+      color: 'rgb(150, 150, 150)',
+      opacity: 0.3,
+      borderRadius: 0,
+      alwaysVisible: true
+    });
+  }
 
-        process.start();
-    }
+  openInspector(html) {
+    let win = this.$iframe[0].contentWindow;
+    let doc = win.document;
+    doc.open();
+    doc.write(html);
+    doc.close();
 
-    renderCurrentPhase() {
-        this.$inspector.hide();
-        this.$content.html('');
-        if (!this.process.hasNextPhase()) {
-            this.$next.hide();
-        }
+    setTimeout(() => {
+      if (typeof win.Timing !== 'undefined') {
+        win.Timing.pause();
+      }
+      this.$inspector.show(); // must be visible for size to be computed
+      let width = Math.min(win.document.body.scrollWidth, this.calcMaxIframeWidth());
+      this.$iframe.css({width});
+      this.$iframeOverlay.css({width});
+      $(this).trigger('change');
+    }, 200);
+  }
 
-        let phase = this.process.getCurrentPhase();
-
-        switch (phase.getType()) {
-            case PhaseTypes.QUESTION:   this._renderPhaseQuestion(phase);   break;
-            case PhaseTypes.ATTEMPT:    this._renderPhaseAttempt(phase);    break;
-            case PhaseTypes.REPORT:     this._renderPhaseReport(phase);     break;
-            default: throw Error('unrecognized phase');
-        }
-
-        setTimeout(() => this.updateScrolling(), 200);
-        $(this).trigger('change');
-    }
-
-    _renderPhaseQuestion(phase) {
-        for (let question of phase.questions) {
-            (new QuestionWidget(question)).appendTo(this.$content);
-        }
-        if (typeof phase.examinedHtml === 'string') {
-            this.openInspector(phase.examinedHtml);
-        }
-    }
-
-    _renderPhaseAttempt(phase) {
-        let widget = (new AttemptWidget(phase)).appendTo(this.$content);
-        $(widget).on('change', () => this.updateScrolling());
-    }
-
-    _renderPhaseReport(phase) {
-        (new ReportWidget(phase)).appendTo(this.$content);
-    }
-
-    updateScrolling() {
-        // https://github.com/rochal/jQuery-slimScroll/issues/16
-        if (this.$content.parent('.slimScrollDiv').size() > 0) {
-            this.$content.parent().replaceWith(this.$content);
-            this.$content.height('auto');
-        }        
-
-        let availableVert = this.$el.innerHeight() - this.$header.outerHeight() - this.$nav.outerHeight();
-
-        this.$content.slimScroll({
-            height: Math.min(availableVert, this.$content.outerHeight()),
-            color: 'rgb(150, 150, 150)',
-            opacity: 0.3,
-            borderRadius: 0,
-            alwaysVisible: true
-        });
-    }
-
-    openInspector(html) {
-        let win = this.$iframe[0].contentWindow;
-        let doc = win.document;
-        doc.open();
-        doc.write(html);
-        doc.close();
-
-        setTimeout(() => {
-            if (typeof win.Timing !== 'undefined') {
-                win.Timing.pause();
-            }
-            this.$inspector.show(); // must be visible for size to be computed
-            let width = Math.min(win.document.body.scrollWidth, this.calcMaxIframeWidth());
-            this.$iframe.css({width});
-            this.$iframeOverlay.css({width});
-            $(this).trigger('change');
-        }, 200);
-    }
-
-    calcMaxIframeWidth() {
-        let menuWidth = 50;
-        let margin = 20;
-        return document.documentElement.clientWidth - this.$header.outerWidth() - menuWidth - 2*margin;
-    }
+  calcMaxIframeWidth() {
+    let menuWidth = 50;
+    let margin = 20;
+    return document.documentElement.clientWidth - this.$header.outerWidth() - menuWidth - 2 * margin;
+  }
 
 }
 
@@ -260,4 +267,4 @@ initCss(`
 
 `);
 
-export { DebuggerWidget };
+export {DebuggerWidget};

@@ -1,41 +1,41 @@
-import { AbstractWidget } from '/twcheese/src/Widget/AbstractWidget.js';
-import { ExporterBBCode } from '/twcheese/src/Models/RepeatAttackLinks/ExporterBBCode.js';
-import { ExporterPlainText } from '/twcheese/src/Models/RepeatAttackLinks/ExporterPlainText.js';
-import { ExporterHTML } from '/twcheese/src/Models/RepeatAttackLinks/ExporterHTML.js';
+import {AbstractWidget} from '../../../src/Widget/AbstractWidget.js';
+import {ExporterBBCode} from '../../../src/Models/RepeatAttackLinks/ExporterBBCode.js';
+import {ExporterPlainText} from '../../../src/Models/RepeatAttackLinks/ExporterPlainText.js';
+import {ExporterHTML} from '../../../src/Models/RepeatAttackLinks/ExporterHTML.js';
 
 
 class ExportRepeatLinksWidget extends AbstractWidget {
 
-    /**
-     * @param {Map.<BattleReportCondensed>} reports 
-     */
-    constructor(reports) {
-        super();
-        this.reports = reports;
-        this.defaultHeader = 'new cheesy attack group';
+  /**
+   * @param {Map.<BattleReportCondensed>} reports
+   */
+  constructor(reports) {
+    super();
+    this.reports = reports;
+    this.defaultHeader = 'new cheesy attack group';
 
-        this.exporters = {
-            bbcode: new ExporterBBCode(),
-            plainLink: new ExporterPlainText(),
-            html: new ExporterHTML()
-        };
+    this.exporters = {
+      bbcode: new ExporterBBCode(),
+      plainLink: new ExporterPlainText(),
+      html: new ExporterHTML()
+    };
 
-        this.initStructure();
-        this.watchSelf();
-        this.updateExportText();
-    }
+    this.initStructure();
+    this.watchSelf();
+    this.updateExportText();
+  }
 
-    initStructure() {
-        this.$el = $(this.createHtml().trim());
-        this.$exportText = this.$el.find('.twcheese-export-text');
-        this.$buttonCopy = this.$el.find('.twcheese-button-copy');
-        this.$headerInput = this.$el.find('#twcheese_export_header');
-        this.$formatOptions = this.$el.find("input[name='twcheese-repeat-attack-export-format']");
-        this.$attackingVillageOptions = this.$el.find("input[name='twcheese-repeat-attack-export-village']");
-    }
+  initStructure() {
+    this.$el = $(this.createHtml().trim());
+    this.$exportText = this.$el.find('.twcheese-export-text');
+    this.$buttonCopy = this.$el.find('.twcheese-button-copy');
+    this.$headerInput = this.$el.find('#twcheese_export_header');
+    this.$formatOptions = this.$el.find("input[name='twcheese-repeat-attack-export-format']");
+    this.$attackingVillageOptions = this.$el.find("input[name='twcheese-repeat-attack-export-village']");
+  }
 
-    createHtml() {
-        return `
+  createHtml() {
+    return `
             <table id="twcheese_reportsFolderExport" style="display: none;">
                 <td>
                     <textarea class="twcheese-export-text" rows="10" cols="40" readonly="true" />
@@ -71,46 +71,46 @@ class ExportRepeatLinksWidget extends AbstractWidget {
                 </td>
             </table>
         `;
-    }
+  }
 
-    watchSelf() {
-        this.$headerInput.on('click', () => {
-            if (this.$headerInput.val() === this.defaultHeader) {
-                this.$headerInput.val('');
-            }
-            this.updateExportText();
-        });
+  watchSelf() {
+    this.$headerInput.on('click', () => {
+      if (this.$headerInput.val() === this.defaultHeader) {
+        this.$headerInput.val('');
+      }
+      this.updateExportText();
+    });
 
-        this.$headerInput.on('input', (e) => {
-            this.updateExportText();
-        });
+    this.$headerInput.on('input', (e) => {
+      this.updateExportText();
+    });
 
-        this.$formatOptions.on('change', (e) => {
-            this.updateExportText();
-        });
+    this.$formatOptions.on('change', (e) => {
+      this.updateExportText();
+    });
 
-        this.$attackingVillageOptions.on('change', (e) => {
-            this.updateExportText();
-        });
+    this.$attackingVillageOptions.on('change', (e) => {
+      this.updateExportText();
+    });
 
-        this.$buttonCopy.on('click', (e) => {
-            e.preventDefault();
-            this.$exportText.select();
-            document.execCommand('copy');
-            window.UI.SuccessMessage('Copied to clipboard');
-        });
-    }
+    this.$buttonCopy.on('click', (e) => {
+      e.preventDefault();
+      this.$exportText.select();
+      document.execCommand('copy');
+      window.UI.SuccessMessage('Copied to clipboard');
+    });
+  }
 
-    updateExportText() {
-        let format = this.$formatOptions.filter(':checked').val();
-        let attackFrom = this.$attackingVillageOptions.filter(':checked').val();
-        let headerText = this.$headerInput.val();
+  updateExportText() {
+    let format = this.$formatOptions.filter(':checked').val();
+    let attackFrom = this.$attackingVillageOptions.filter(':checked').val();
+    let headerText = this.$headerInput.val();
 
-        let exporter = this.exporters[format];
-        let exportText = exporter.buildExportText(this.reports.values(), attackFrom, headerText);
-        this.$exportText.val(exportText);
-    }
+    let exporter = this.exporters[format];
+    let exportText = exporter.buildExportText(this.reports.values(), attackFrom, headerText);
+    this.$exportText.val(exportText);
+  }
 
 }
 
-export { ExportRepeatLinksWidget };
+export {ExportRepeatLinksWidget};

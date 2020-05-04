@@ -1,47 +1,47 @@
-import { ProgressMonitor } from '/twcheese/src/Models/ProgressMonitor.js';
-import { ImageSrc } from '/twcheese/conf/ImageSrc.js';
-import { initCss, fadeGameContent, unfadeGameContent } from '/twcheese/src/Util/UI.js';
+import {ProgressMonitor} from '../../src/Models/ProgressMonitor.js';
+import {ImageSrc} from '../../conf/ImageSrc.js';
+import {fadeGameContent, initCss, unfadeGameContent} from '../../src/Util/UI.js';
 
 
 /**
  * A prompt with a progress bar.
  * It only asks confirmation and shows progress.
- * 
+ *
  * Its the responsibility of the onConfirm callback to do any loading.
- * 
+ *
  * @param {function} onConfirm - async function, will be passsed one param: a ProgressMonitor
  */
 function promptLoadHauls(onConfirm) {
-    $('body').append(popupHtml);
-    fadeGameContent();
+  $('body').append(popupHtml);
+  fadeGameContent();
 
-    let $progressBarFiller = $('#twcheese_hauls_loading_bar').find('.filler');
-    let $progressText = $('#twcheese_hauls_loading_text');
-    let updateProgress = function(progress, goal) {
-        let percent = 100 * progress / goal;
-        $progressBarFiller.css({width: `${percent}%`});
-        $progressText.html(`${progress}/${goal}`);
-    }
-    let progressMonitor = new ProgressMonitor();
-    progressMonitor.onChange((e) => updateProgress(e.progress, e.goal));
+  let $progressBarFiller = $('#twcheese_hauls_loading_bar').find('.filler');
+  let $progressText = $('#twcheese_hauls_loading_text');
+  let updateProgress = function (progress, goal) {
+    let percent = 100 * progress / goal;
+    $progressBarFiller.css({width: `${percent}%`});
+    $progressText.html(`${progress}/${goal}`);
+  }
+  let progressMonitor = new ProgressMonitor();
+  progressMonitor.onChange((e) => updateProgress(e.progress, e.goal));
 
-    $('#twcheese_hauls_prompt_confirm').on('click', async function(e) {
-        e.preventDefault();
-        document.getElementById('twcheese_servant_text').innerHTML = '<br/>May the cheese be with you.';
-        $('#twcheese_servant_info_prompt').hide();
-        $('#twcheese_servant_info_loading').show();
-        
-        await onConfirm(progressMonitor);
+  $('#twcheese_hauls_prompt_confirm').on('click', async function (e) {
+    e.preventDefault();
+    document.getElementById('twcheese_servant_text').innerHTML = '<br/>May the cheese be with you.';
+    $('#twcheese_servant_info_prompt').hide();
+    $('#twcheese_servant_info_loading').show();
 
-        $('#twcheese_showHaulsPrompt').remove();
-        unfadeGameContent();
-    });
+    await onConfirm(progressMonitor);
 
-    $('#twcheese_hauls_prompt_cancel').on('click', function(e) {
-        e.preventDefault();
-        $('#twcheese_showHaulsPrompt').remove();
-        unfadeGameContent();
-    });
+    $('#twcheese_showHaulsPrompt').remove();
+    unfadeGameContent();
+  });
+
+  $('#twcheese_hauls_prompt_cancel').on('click', function (e) {
+    e.preventDefault();
+    $('#twcheese_showHaulsPrompt').remove();
+    unfadeGameContent();
+  });
 }
 
 
@@ -126,4 +126,4 @@ initCss(`
 `);
 
 
-export { promptLoadHauls };
+export {promptLoadHauls};

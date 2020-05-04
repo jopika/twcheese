@@ -1,5 +1,5 @@
-import { troopUtil } from '/twcheese/src/Models/Troops.js';
-import { gameConfig } from '/twcheese/src/Util/Config.js';
+import {troopUtil} from '../../src/Models/Troops.js';
+import {gameConfig} from '../../src/Util/Config.js';
 
 
 /**
@@ -11,21 +11,21 @@ import { gameConfig } from '/twcheese/src/Util/Config.js';
  * @return {{loyaltyNow: number, loyaltyAtArrival: number}}
  */
 function calcLoyalty(reportedLoyalty, timeReported, timeNow, home, target) {
-    if (reportedLoyalty <= 0) {
-        reportedLoyalty = 25; // loyalty jumps to 25 after a village is conquered
-    }
+  if (reportedLoyalty <= 0) {
+    reportedLoyalty = 25; // loyalty jumps to 25 after a village is conquered
+  }
 
-    let hourlyGain = gameConfig.get('speed');
+  let hourlyGain = gameConfig.get('speed');
 
-    let hoursPassed = (timeNow - timeReported) / 3600000;
-    let loyaltyNow = Math.min(100, Math.floor(reportedLoyalty + hoursPassed * hourlyGain));
+  let hoursPassed = (timeNow - timeReported) / 3600000;
+  let loyaltyNow = Math.min(100, Math.floor(reportedLoyalty + hoursPassed * hourlyGain));
 
-    let distance = target.distanceTo(home);
-    let travelHours = troopUtil.travelDuration('snob', distance) / 3600000;
-    let loyaltyAtArrival = Math.min(100, Math.floor(loyaltyNow + travelHours * hourlyGain));
+  let distance = target.distanceTo(home);
+  let travelHours = troopUtil.travelDuration('snob', distance) / 3600000;
+  let loyaltyAtArrival = Math.min(100, Math.floor(loyaltyNow + travelHours * hourlyGain));
 
-    return {loyaltyNow, loyaltyAtArrival};
+  return {loyaltyNow, loyaltyAtArrival};
 }
 
 
-export { calcLoyalty };
+export {calcLoyalty};

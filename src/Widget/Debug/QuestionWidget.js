@@ -1,59 +1,59 @@
-import { AbstractWidget } from '/twcheese/src/Widget/AbstractWidget.js';
-import { initCss, escapeHtml } from '/twcheese/src/Util/UI.js';
-import { QuestionTypes } from '/twcheese/src/Models/Debug/QuestionTypes.js';
+import {AbstractWidget} from '../../../src/Widget/AbstractWidget.js';
+import {escapeHtml, initCss} from '../../../src/Util/UI.js';
+import {QuestionTypes} from '../../../src/Models/Debug/QuestionTypes.js';
 
 
 class QuestionWidget extends AbstractWidget {
-    constructor(question) {
-        super();
-        this.question = question;
-        this.initStructure(question);
-        this.watchSelf();
-    }
+  constructor(question) {
+    super();
+    this.question = question;
+    this.initStructure(question);
+    this.watchSelf();
+  }
 
-    initStructure() {
-        this.$el = $(this.createHtml().trim());
-        this.$answers = this.$el.find('.twcheese-debug-question-answer');
-    }
+  initStructure() {
+    this.$el = $(this.createHtml().trim());
+    this.$answers = this.$el.find('.twcheese-debug-question-answer');
+  }
 
-    createHtml() {
-        let options = [];
+  createHtml() {
+    let options = [];
 
-        for (let i = 0; i < this.question.options.length; i++) {
-            let option = this.question.options[i];
-            options.push(`
+    for (let i = 0; i < this.question.options.length; i++) {
+      let option = this.question.options[i];
+      options.push(`
                 <div class="twcheese-debug-question-answer ${option.className}" data-index="${i}">
                     ${option.text}
                 </div>
             `);
-        }
-
-        switch (this.question.getType()) {
-            case QuestionTypes.FREE_FORM:
-                return this._createHtmlQuestionFreeForm();
-            case QuestionTypes.VALUE:
-                return this._createHtmlQuestionAboutValue(options);
-            case QuestionTypes.SELECT:
-                return this._createHtmlQuestionSelect(options);
-            default:
-                throw Error('unrecognized question type');    
-        }                
     }
 
-    _createHtmlQuestionSelect(options) {
-        return `
+    switch (this.question.getType()) {
+      case QuestionTypes.FREE_FORM:
+        return this._createHtmlQuestionFreeForm();
+      case QuestionTypes.VALUE:
+        return this._createHtmlQuestionAboutValue(options);
+      case QuestionTypes.SELECT:
+        return this._createHtmlQuestionSelect(options);
+      default:
+        throw Error('unrecognized question type');
+    }
+  }
+
+  _createHtmlQuestionSelect(options) {
+    return `
             <div class="twcheese-debug-question">
                 <div class="twcheese-debug-question-text">${this.question.text}</div>
                 <hr/>
                 ${options.join('')}
             </div>
         `;
-    }
+  }
 
-    _createHtmlQuestionFreeForm() {
-        let option = this.question.options[0];
+  _createHtmlQuestionFreeForm() {
+    let option = this.question.options[0];
 
-        return `
+    return `
             <div class="twcheese-debug-question">
                 <div class="twcheese-debug-question-text">${this.question.text}</div>
                 <hr/>
@@ -64,12 +64,12 @@ class QuestionWidget extends AbstractWidget {
                 >${escapeHtml(option.value)}</textarea>
             </div>
         `;
-    }
+  }
 
-    _createHtmlQuestionAboutValue(options) {
-        let valueRendered = this.createHtmlForValue(this.question.value);
+  _createHtmlQuestionAboutValue(options) {
+    let valueRendered = this.createHtmlForValue(this.question.value);
 
-        return `
+    return `
             <div class="twcheese-debug-question">
                 <div class="twcheese-debug-question-text">${this.question.text}</div>
                 <hr/>
@@ -79,49 +79,49 @@ class QuestionWidget extends AbstractWidget {
                 </div>                
             </div>
         `;
-    }
+  }
 
-    createHtmlForValue(value) {
-        if (typeof value === 'undefined' || value === null) {
-            return '<span class="non-existent">non-existent</span>';
-        }
-        if (typeof value.toDebugString === 'function') {
-            return escapeHtml(value.toDebugString());
-        }
-        if (typeof value === 'object') {
-            return Object.entries(value).map((input) => {
-                let [propName, propVal] = input;
-                return `<div class="twcheese-debug-value-iter">
+  createHtmlForValue(value) {
+    if (typeof value === 'undefined' || value === null) {
+      return '<span class="non-existent">non-existent</span>';
+    }
+    if (typeof value.toDebugString === 'function') {
+      return escapeHtml(value.toDebugString());
+    }
+    if (typeof value === 'object') {
+      return Object.entries(value).map((input) => {
+        let [propName, propVal] = input;
+        return `<div class="twcheese-debug-value-iter">
                     <div class="key">${this.createLabelForValue(propVal, propName)}</div>
                     <div class="value">${this.createHtmlForValue(propVal)}</div>
                 </div>`;
-            }).join('');
-        }
-        return escapeHtml(value.toString());
+      }).join('');
+    }
+    return escapeHtml(value.toString());
+  }
+
+  createLabelForValue(value, defaultLabel) {
+    if (typeof value.imageSrc === 'function') {
+      return `<image src="${value.imageSrc()}" />`;
+    }
+    return defaultLabel;
+  }
+
+  watchSelf() {
+    if (this.question.getType() === QuestionTypes.FREE_FORM) {
+      this.$answers.on('input', (e) => {
+        let $answer = $(e.target);
+        this.question.options[0].setValue($answer.val());
+      });
+      return;
     }
 
-    createLabelForValue(value, defaultLabel) {
-        if (typeof value.imageSrc === 'function') {
-            return `<image src="${value.imageSrc()}" />`;
-        }
-        return defaultLabel;
-    }
-
-    watchSelf() {
-        if (this.question.getType() === QuestionTypes.FREE_FORM) {
-            this.$answers.on('input', (e) => {
-                let $answer = $(e.target);
-                this.question.options[0].setValue($answer.val());
-            });
-            return;
-        }
-
-        this.$answers.on('click', (e) => {
-            this.$answers.removeClass('active');
-            let $answer = $(e.target).addClass('active');
-            this.question.setSelectedOption($answer.data('index'));
-        });
-    }
+    this.$answers.on('click', (e) => {
+      this.$answers.removeClass('active');
+      let $answer = $(e.target).addClass('active');
+      this.question.setSelectedOption($answer.data('index'));
+    });
+  }
 
 }
 
@@ -225,4 +225,4 @@ initCss(`
 `);
 
 
-export { QuestionWidget };
+export {QuestionWidget};

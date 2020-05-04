@@ -1,39 +1,39 @@
-import { AbstractWidget } from '/twcheese/src/Widget/AbstractWidget.js';
-import { ImageSrc } from '/twcheese/conf/ImageSrc.js';
-import { escapeHtml } from '/twcheese/src/Util/UI.js';
-import { userConfig } from '/twcheese/src/Util/Config.js';
+import {AbstractWidget} from '../../src/Widget/AbstractWidget.js';
+import {ImageSrc} from '../../conf/ImageSrc.js';
+import {escapeHtml} from '../../src/Util/UI.js';
+import {userConfig} from '../../src/Util/Config.js';
 
 
 class ReportRenamerWidget extends AbstractWidget {
 
-    /**
-     * @param {ReportRenamer} renamer 
-     * @param {BattleReport} report      
-     */
-    constructor(renamer, report) {
-        super();
-        this.renamer = renamer;
-        this.report = report;
+  /**
+   * @param {ReportRenamer} renamer
+   * @param {BattleReport} report
+   */
+  constructor(renamer, report) {
+    super();
+    this.renamer = renamer;
+    this.report = report;
 
-        this.initStructure();
-        this.watchSelf();
-        this.applyUserConfig();
-    }
+    this.initStructure();
+    this.watchSelf();
+    this.applyUserConfig();
+  }
 
-    initStructure() {
-        this.$el = $(this.createHtml().trim());
-        this.$note = this.$el.find('#twcheese_note');
-        this.$renameButton = this.$el.find('button');
-        this.$autoRename = this.$el.find('#twcheese_auto_rename');
-        this.$namePreview = this.$el.find('#twcheese_rename_preview');
-        this.$availableChars = this.$el.find('#twcheese_availableCharacters');
-    }
+  initStructure() {
+    this.$el = $(this.createHtml().trim());
+    this.$note = this.$el.find('#twcheese_note');
+    this.$renameButton = this.$el.find('button');
+    this.$autoRename = this.$el.find('#twcheese_auto_rename');
+    this.$namePreview = this.$el.find('#twcheese_rename_preview');
+    this.$availableChars = this.$el.find('#twcheese_availableCharacters');
+  }
 
-    createHtml() {
-        let renamer = this.renamer;
-        let name = renamer.createName(this.report, '');
+  createHtml() {
+    let renamer = this.renamer;
+    let name = renamer.createName(this.report, '');
 
-        return `
+    return `
             <div id="twcheese_renamer" align="center">
                 <span align="center"><h2>Renamer</h2></span>
                 note <input id="twcheese_note" type="text"/>
@@ -44,32 +44,32 @@ class ReportRenamerWidget extends AbstractWidget {
                 <br/><b>Preview: </b><span id="twcheese_rename_preview">${escapeHtml(name)}</span>
             </div>
         `;
-    }
+  }
 
-    watchSelf() {
-        let renamer = this.renamer;
+  watchSelf() {
+    let renamer = this.renamer;
 
-        this.$note.on('input', () => {
-            let name = renamer.createName(this.report, this.$note.val());
-            this.$namePreview.text(name);
-            this.$availableChars.text(renamer.availableChars(name));
-        });
+    this.$note.on('input', () => {
+      let name = renamer.createName(this.report, this.$note.val());
+      this.$namePreview.text(name);
+      this.$availableChars.text(renamer.availableChars(name));
+    });
 
-        this.$renameButton.on('click', () => {
-            this.renamer.rename(this.report, this.$note.val());
-        });
+    this.$renameButton.on('click', () => {
+      this.renamer.rename(this.report, this.$note.val());
+    });
 
-        this.$autoRename.on('click', function() {
-            userConfig.set('BattleReportEnhancer.autoRename', this.checked);
-        });
-    }
+    this.$autoRename.on('click', function () {
+      userConfig.set('BattleReportEnhancer.autoRename', this.checked);
+    });
+  }
 
-    applyUserConfig() {
-        let autoRename = userConfig.get('BattleReportEnhancer.autoRename', false);
-        this.$autoRename.prop('checked', autoRename);
-    }
+  applyUserConfig() {
+    let autoRename = userConfig.get('BattleReportEnhancer.autoRename', false);
+    this.$autoRename.prop('checked', autoRename);
+  }
 
 }
 
 
-export { ReportRenamerWidget };
+export {ReportRenamerWidget};

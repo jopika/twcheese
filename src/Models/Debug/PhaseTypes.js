@@ -1,7 +1,7 @@
 const PhaseTypes = {
-    ATTEMPT: 'attempt',
-    QUESTION: 'question',
-    REPORT: 'report'
+  ATTEMPT: 'attempt',
+  QUESTION: 'question',
+  REPORT: 'report'
 };
 
-export { PhaseTypes };
+export {PhaseTypes};

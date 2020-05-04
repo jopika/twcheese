@@ -1,7 +1,7 @@
-import { twAlert } from '/twcheese/src/Prompt/twAlert.js';
+import {twAlert} from '../../src/Prompt/twAlert.js';
 
 async function alertPremiumRequired() {
-    let message = `
+  let message = `
         This script relies on features that are only available to <a href="game.php?screen=premium">premium account</a> users.
         <br/>
         <p style="font-size: 10px;">
@@ -9,8 +9,8 @@ async function alertPremiumRequired() {
             <br/>Or <strong>30+ years</strong> of tw premium account!
         </p>`;
 
-    let buttonText = `Do I look like I'm made out of money?`;
-    return twAlert(message, buttonText);
+  let buttonText = `Do I look like I'm made out of money?`;
+  return twAlert(message, buttonText);
 }
 
-export { alertPremiumRequired };
+export {alertPremiumRequired};

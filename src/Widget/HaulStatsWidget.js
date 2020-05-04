@@ -1,58 +1,58 @@
-import { AbstractWidget } from '/twcheese/src/Widget/AbstractWidget.js';
-import { Command } from '/twcheese/src/Models/Command.js';
-import { ImageSrc } from '/twcheese/conf/ImageSrc.js';
-import { initCss } from '/twcheese/src/Util/UI.js';
-import { TwCheeseDate } from '/twcheese/src/Models/TwCheeseDate.js';
-import { userConfig } from '/twcheese/src/Util/Config.js';
+import {AbstractWidget} from '../../src/Widget/AbstractWidget.js';
+import {Command} from '../../src/Models/Command.js';
+import {ImageSrc} from '../../conf/ImageSrc.js';
+import {initCss} from '../../src/Util/UI.js';
+import {TwCheeseDate} from '../../src/Models/TwCheeseDate.js';
+import {userConfig} from '../../src/Util/Config.js';
 
 class HaulStatsWidget extends AbstractWidget {
 
-    /**
-     * @param {Command[]} commands
-     * @param {int|null} pageNumber
-     */
-    constructor(commands, pageNumber) {
-        super();
-        this.commands = commands;
-        this.pageNumber = pageNumber;
+  /**
+   * @param {Command[]} commands
+   * @param {int|null} pageNumber
+   */
+  constructor(commands, pageNumber) {
+    super();
+    this.commands = commands;
+    this.pageNumber = pageNumber;
 
-        this.initStructure();
-        this.watchSelf();
+    this.initStructure();
+    this.watchSelf();
 
-        this.$to.find('option').last().prop('selected', true);
-        this.updateSum();
+    this.$to.find('option').last().prop('selected', true);
+    this.updateSum();
+  }
+
+  initStructure() {
+    this.$el = $(this.createHtml().trim());
+    this.$from = this.$el.find('#twcheese_pillaging_stats_from');
+    this.$to = this.$el.find('#twcheese_pillaging_stats_to');
+    this.$sum = this.$el.find('#twcheese_pillaging_results');
+    this.$toggleIcon = this.$el.find('#twcheese_pillaging_stats_toggle');
+    this.$content = this.$el.find('#twcheese_pillaging_stats_content');
+  }
+
+  createHtml() {
+    let summationFromOptions = [];
+    let summationToOptions = [];
+    let hourlyBreakdowns = [];
+
+    let startOfHour = TwCheeseDate.newServerDate().startOfHour();
+    let latestCommandArrival;
+    if (this.commands.length > 0) {
+      latestCommandArrival = this.commands[this.commands.length - 1].arrival;
     }
 
-    initStructure() {
-        this.$el = $(this.createHtml().trim());
-        this.$from = this.$el.find('#twcheese_pillaging_stats_from');
-        this.$to = this.$el.find('#twcheese_pillaging_stats_to');
-        this.$sum = this.$el.find('#twcheese_pillaging_results');
-        this.$toggleIcon = this.$el.find('#twcheese_pillaging_stats_toggle');
-        this.$content = this.$el.find('#twcheese_pillaging_stats_content');
-    }
+    while (startOfHour < latestCommandArrival) {
+      let endOfHour = startOfHour.endOfHour();
+      let hourOfDay = startOfHour.getServerHours();
+      let dayHint = this.dayHint(startOfHour);
 
-    createHtml() {
-        let summationFromOptions = [];
-        let summationToOptions = [];
-        let hourlyBreakdowns = [];
+      summationFromOptions.push(`<option value=${startOfHour.getTime()}>${hourOfDay}:00 ${dayHint}</option>`);
+      summationToOptions.push(`<option value="${endOfHour.getTime()}">${hourOfDay}:59 ${dayHint}</option>`);
 
-        let startOfHour = TwCheeseDate.newServerDate().startOfHour();
-        let latestCommandArrival;
-        if (this.commands.length > 0) {
-            latestCommandArrival = this.commands[this.commands.length - 1].arrival;
-        }
-
-        while (startOfHour < latestCommandArrival) {
-            let endOfHour = startOfHour.endOfHour();
-            let hourOfDay = startOfHour.getServerHours();
-            let dayHint = this.dayHint(startOfHour);
-
-            summationFromOptions.push(`<option value=${startOfHour.getTime()}>${hourOfDay}:00 ${dayHint}</option>`);
-            summationToOptions.push(`<option value="${endOfHour.getTime()}">${hourOfDay}:59 ${dayHint}</option>`);
-
-            let result = Command.sumPropsFromTimeframe(this.commands, startOfHour, endOfHour);
-            hourlyBreakdowns.push(`
+      let result = Command.sumPropsFromTimeframe(this.commands, startOfHour, endOfHour);
+      hourlyBreakdowns.push(`
                 <tr>
                     <td>${hourOfDay}:00 - ${hourOfDay}:59 ${dayHint}</td>
                     <td>${result.haul.wood}</td>
@@ -63,16 +63,16 @@ class HaulStatsWidget extends AbstractWidget {
                 </tr>
             `);
 
-            startOfHour = startOfHour.addHours(1);
-        }
+      startOfHour = startOfHour.addHours(1);
+    }
 
-        let pageInfo = this.pageNumber ? `from Page ${this.pageNumber}` : '';
+    let pageInfo = this.pageNumber ? `from Page ${this.pageNumber}` : '';
 
-        let collapsed = userConfig.get('HaulStatsWidget.collapseStats', false);
-        let toggleIconSrc = collapsed ? ImageSrc.plus : ImageSrc.minus;
-        let contentDisplay = collapsed ? 'none' : 'block';
+    let collapsed = userConfig.get('HaulStatsWidget.collapseStats', false);
+    let toggleIconSrc = collapsed ? ImageSrc.plus : ImageSrc.minus;
+    let contentDisplay = collapsed ? 'none' : 'block';
 
-        return `
+    return `
             <div id="twcheese_pillaging_stats" class="vis widget">
                 <h4>
                     Pillaging Statistics
@@ -111,64 +111,63 @@ class HaulStatsWidget extends AbstractWidget {
                 </div>
             </div>
         `;
+  }
+
+  /**
+   * @param {TwCheeseDate} date
+   * @return {string}
+   */
+  dayHint(date) {
+    if (date.isTodayOnServer()) {
+      return '';
+    } else if (date.isTomorrowOnServer()) {
+      return ' (tomorrow)';
     }
+    return ' (' + date.toLocaleDateString('en-US', {month: 'short', day: '2-digit'}) + ')';
+  }
 
-    /**
-     * @param {TwCheeseDate} date
-     * @return {string}
-     */
-    dayHint(date) {
-        if (date.isTodayOnServer()) {
-            return '';
-        }
-        else if (date.isTomorrowOnServer()) {
-            return ' (tomorrow)';
-        }
-        return ' (' + date.toLocaleDateString('en-US', {month: 'short', day: '2-digit'}) + ')';
+  watchSelf() {
+    this.$toggleIcon.on('click', (e) => {
+      e.preventDefault();
+      this.toggleCollapse();
+    });
+    this.$to.on('change', (e) => this.updateSum());
+    this.$from.on('change', (e) => this.updateSum());
+  }
+
+  /**
+   *  change the results displayed in the summation section
+   */
+  updateSum() {
+    let startTime = TwCheeseDate.newServerDate(parseInt(this.$from.val()));
+    let endTime = TwCheeseDate.newServerDate(parseInt(this.$to.val()));
+    if (startTime > endTime) {
+      tmpTime = startTime;
+      startTime = endTime;
+      endTime = tmpTime;
     }
+    let sum = Command.sumPropsFromTimeframe(this.commands, startTime, endTime);
 
-    watchSelf() {
-        this.$toggleIcon.on('click', (e) => {
-            e.preventDefault();
-            this.toggleCollapse();
-        });
-        this.$to.on('change', (e) => this.updateSum());
-        this.$from.on('change', (e) => this.updateSum());
-    }
-
-    /**
-     *	change the results displayed in the summation section
-     */
-    updateSum() {
-        let startTime = TwCheeseDate.newServerDate(parseInt(this.$from.val()));
-        let endTime = TwCheeseDate.newServerDate(parseInt(this.$to.val()));
-        if (startTime > endTime) {
-            tmpTime = startTime;
-            startTime = endTime;
-            endTime = tmpTime;
-        }
-        let sum = Command.sumPropsFromTimeframe(this.commands, startTime, endTime);
-
-        this.$sum.html(`
+    this.$sum.html(`
             <img src="${ImageSrc.wood}"> ${sum.haul.wood}
             <img src="${ImageSrc.stone}"> ${sum.haul.stone}
             <img src="${ImageSrc.iron}"> ${sum.haul.iron}
             &nbsp;&nbsp;| ${sum.sumLoot()}/${sum.haulCapacity} (${sum.calcHaulPercent()}%)
         `);
-    }
+  }
 
-    toggleCollapse() {
-        let $toggleIcon = this.$toggleIcon;
+  toggleCollapse() {
+    let $toggleIcon = this.$toggleIcon;
 
-        this.$content.toggle({
-            duration: 200,
-            start: function() {
-                let willCollapse = $toggleIcon.attr('src').includes(ImageSrc.minus);
-                $toggleIcon.attr('src', willCollapse ? ImageSrc.plus : ImageSrc.minus);
-                userConfig.set('HaulStatsWidget.collapseStats', willCollapse);
-            }
-        });
-    }
+    this.$content.toggle({
+      duration: 200,
+      start: function () {
+        let willCollapse = $toggleIcon.attr('src').includes(ImageSrc.minus);
+        $toggleIcon.attr('src', willCollapse ? ImageSrc.plus : ImageSrc.minus);
+        userConfig.set('HaulStatsWidget.collapseStats', willCollapse);
+      }
+    });
+  }
 
 }
 
@@ -184,4 +183,4 @@ initCss(`
 `);
 
 
-export { HaulStatsWidget };
+export {HaulStatsWidget};

@@ -4,9 +4,10 @@
 // to help you make things look/swim/quack like a duck.
 
 // @ts-ignore
-import { Phase } from './Phase';
+import {Phase} from './Phase';
 
 interface IThingToFollowUpOn {
     followUpPhases: Array<Phase>;
+
     addFollowUp(phase: Phase): any;
 }

@@ -1,34 +1,34 @@
-import { AbstractWidget } from '/twcheese/src/Widget/AbstractWidget.js';
-import { DebuggerWidget } from '/twcheese/src/Widget/Debug/DebuggerWidget.js';
-import { initCss } from '/twcheese/src/Util/UI.js';
-import { ImageSrc } from '/twcheese/conf/ImageSrc.js';
+import {AbstractWidget} from '../../src/Widget/AbstractWidget.js';
+import {DebuggerWidget} from '../../src/Widget/Debug/DebuggerWidget.js';
+import {initCss} from '../../src/Util/UI.js';
+import {ImageSrc} from '../../conf/ImageSrc.js';
 
 
 class SidebarWidget extends AbstractWidget {
-    constructor() {
-        super();
-        this.initStructure();
-        this.watchSelf();
-        this.isExpandedVert = false;
-        this.activeMenuItem = null;
+  constructor() {
+    super();
+    this.initStructure();
+    this.watchSelf();
+    this.isExpandedVert = false;
+    this.activeMenuItem = null;
 
-        this.contents = {
-            bugReporter: (new DebuggerWidget()).appendTo(this.$content)
-        };
-        this.watchContents();
-    }
+    this.contents = {
+      bugReporter: (new DebuggerWidget()).appendTo(this.$content)
+    };
+    this.watchContents();
+  }
 
-    initStructure() {
-        this.$el = $(this.createHtml().trim());
-        this.$menuMain = this.$el.find('.menu-item.main');
-        this.$mainIcon = this.$menuMain.find('.icon');
-        this.$menuBug = this.$el.find('.menu-item.bug');
-        this.$menuGithub = this.$el.find('.menu-item.github');
-        this.$content = this.$el.find('.twcheese-sidebar-content');
-    }
+  initStructure() {
+    this.$el = $(this.createHtml().trim());
+    this.$menuMain = this.$el.find('.menu-item.main');
+    this.$mainIcon = this.$menuMain.find('.icon');
+    this.$menuBug = this.$el.find('.menu-item.bug');
+    this.$menuGithub = this.$el.find('.menu-item.github');
+    this.$content = this.$el.find('.twcheese-sidebar-content');
+  }
 
-    createHtml() {
-        return `
+  createHtml() {
+    return `
             <div id="twcheese-sidebar">
                 <div class="twcheese-sidebar-menu">
                     <div class="menu-item main"><div class="icon"></div></div>
@@ -41,110 +41,110 @@ class SidebarWidget extends AbstractWidget {
                 <div class="twcheese-sidebar-content"></div>
             </div>
         `;
+  }
+
+  watchSelf() {
+    this.$menuMain.on('click', () => this.toggleExpand());
+
+    this.$menuBug.on('click', () => {
+      if (this.$menuBug.hasClass('active')) {
+        this.$menuBug.removeClass('active');
+        this.activeMenuItem = null;
+        this.shrinkHoriz();
+      } else {
+        this.contents.bugReporter.startProcessForLastUsedToolIfSensible();
+        this.$menuBug.addClass('active');
+        this.activeMenuItem = 'bug';
+        this.expandHoriz();
+      }
+    });
+  }
+
+  watchContents() {
+    $.each(this.contents, (key, content) => {
+      $(content).on('change', () => {
+        if (this.activeMenuItem) {
+          this.$el.width(this.$el[0].scrollWidth);
+        }
+      })
+    });
+  }
+
+  async toggleExpand() {
+    let durationVert = 200;
+    let durationHoriz = this.activeMenuItem ? 200 : 0;
+    let durationSpin = durationVert + durationHoriz;
+    this.spinMainIcon(durationSpin);
+
+    if (this.isExpandedVert) {
+      if (this.activeMenuItem) {
+        await this.shrinkHoriz(durationHoriz);
+      }
+      this.shrinkVert(durationVert);
+    } else {
+      await this.expandVert(durationVert);
+      if (this.activeMenuItem) {
+        this.expandHoriz(durationHoriz);
+      }
     }
+  }
 
-    watchSelf() {
-        this.$menuMain.on('click', () => this.toggleExpand());
-
-        this.$menuBug.on('click', () => {
-            if (this.$menuBug.hasClass('active')) {
-                this.$menuBug.removeClass('active');
-                this.activeMenuItem = null;
-                this.shrinkHoriz();
-            } else {
-                this.contents.bugReporter.startProcessForLastUsedToolIfSensible();
-                this.$menuBug.addClass('active');
-                this.activeMenuItem = 'bug';
-                this.expandHoriz();
-            }
+  spinMainIcon(durationMs) {
+    $({deg: 0}).animate({deg: 180}, {
+      duration: durationMs,
+      step: (angle) => {
+        this.$mainIcon.css({
+          transform: 'rotate(' + angle + 'deg)'
         });
-    }
+      }
+    });
+  }
 
-    watchContents() {
-        $.each(this.contents, (key, content) => {
-            $(content).on('change', () => {
-                if (this.activeMenuItem) {
-                    this.$el.width(this.$el[0].scrollWidth);
-                }                
-            })
-        });
-    }
+  async expandVert(durationMs) {
+    this.isExpandedVert = true;
+    return new Promise((resolve, reject) => {
+      let options = {
+        duration: durationMs,
+        complete: () => {
+          this.$menuGithub.show();
+          resolve();
+        }
+      };
+      this.$el.animate({
+        height: '100%',
+        easing: 'linear'
+      }, options);
+    });
+  }
 
-    async toggleExpand() {
-        let durationVert = 200;
-        let durationHoriz = this.activeMenuItem ? 200 : 0;
-        let durationSpin = durationVert + durationHoriz;
-        this.spinMainIcon(durationSpin);
-        
-        if (this.isExpandedVert) {
-            if (this.activeMenuItem) {
-                await this.shrinkHoriz(durationHoriz);
-            }
-            this.shrinkVert(durationVert);
-        } else {
-            await this.expandVert(durationVert);
-            if (this.activeMenuItem) {
-                this.expandHoriz(durationHoriz);
-            }
-        }        
-    }
+  shrinkVert(durationMs) {
+    this.$menuGithub.hide();
+    this.isExpandedVert = false;
+    this.$el.animate({
+      height: '50px'
+    }, durationMs);
+  }
 
-    spinMainIcon(durationMs) {
-        $({deg: 0}).animate({deg: 180}, {
-            duration: durationMs,
-            step: (angle) => {
-                this.$mainIcon.css({
-                    transform: 'rotate(' + angle + 'deg)'
-                });
-            }
-        });
-    }
+  expandHoriz(durationMs) {
+    let options = {
+      duration: durationMs,
+    };
+    this.$el.animate({
+      width: this.$el[0].scrollWidth
+    }, options);
+  }
 
-    async expandVert(durationMs) {
-        this.isExpandedVert = true;
-        return new Promise((resolve, reject) => {
-            let options = {
-                duration: durationMs,
-                complete: () => {
-                    this.$menuGithub.show();
-                    resolve();
-                }
-            };
-            this.$el.animate({
-                height: '100%',
-                easing: 'linear'
-            }, options);
-        });
-    }
-
-    shrinkVert(durationMs) {
-        this.$menuGithub.hide();
-        this.isExpandedVert = false;
-        this.$el.animate({
-            height: '50px'
-        }, durationMs);
-    }
-
-    expandHoriz(durationMs) {
-        let options = {
-            duration: durationMs,
-        };
-        this.$el.animate({
-            width: this.$el[0].scrollWidth
-        }, options);
-    }
-
-    async shrinkHoriz(durationMs) {
-        return new Promise((resolve, reject) => {
-            let options = {
-                duration: durationMs,
-                complete: resolve
-            };
-            this.$el.animate({
-                width: '50px'
-            }, options);
-        });
-    }
+  async shrinkHoriz(durationMs) {
+    return new Promise((resolve, reject) => {
+      let options = {
+        duration: durationMs,
+        complete: resolve
+      };
+      this.$el.animate({
+        width: '50px'
+      }, options);
+    });
+  }
 
 
 }
@@ -254,4 +254,4 @@ initCss(`
 `);
 
 
-export { SidebarWidget };
+export {SidebarWidget};

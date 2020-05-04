@@ -1,30 +1,30 @@
-import { AbstractWidget } from '/twcheese/src/Widget/AbstractWidget.js';
-import { initCss } from '/twcheese/src/Util/UI.js';
+import {AbstractWidget} from '../../../src/Widget/AbstractWidget.js';
+import {initCss} from '../../../src/Util/UI.js';
 
 
 class AttemptWidget extends AbstractWidget {
-    constructor(phase) {
-        super();
-        this.phase = phase;
-        this.initStructure();
-        this.watchSelf();
-        this.$abort.hide();
-    }
+  constructor(phase) {
+    super();
+    this.phase = phase;
+    this.initStructure();
+    this.watchSelf();
+    this.$abort.hide();
+  }
 
-    initStructure() {
-        this.$el = $(this.createHtml().trim());
-        this.$abort = this.$el.find('.twcheese-debug-attempt-abort');
-    }
+  initStructure() {
+    this.$el = $(this.createHtml().trim());
+    this.$abort = this.$el.find('.twcheese-debug-attempt-abort');
+  }
 
-    createHtml() {
-        if (this.phase.instructions) {
-            return this.createHtmlForUserInteraction();
-        }
-        return this.createHtmlForAutoAttempt();
+  createHtml() {
+    if (this.phase.instructions) {
+      return this.createHtmlForUserInteraction();
     }
+    return this.createHtmlForAutoAttempt();
+  }
 
-    createHtmlForUserInteraction() {
-        return `
+  createHtmlForUserInteraction() {
+    return `
             <div class="twcheese-debug-attempt">
                 <p>${this.phase.instructions}</p>
                 <div style="text-align: center;">
@@ -32,29 +32,29 @@ class AttemptWidget extends AbstractWidget {
                 </div>
             </div>
         `;
-    }
+  }
 
-    createHtmlForAutoAttempt() {
-        return `
+  createHtmlForAutoAttempt() {
+    return `
             <div class="twcheese-debug-attempt">
                 Standby for <i>${this.phase.name}</i>.
             </div>
         `;
-    }
+  }
 
-    watchSelf() {
-        this.$abort.on('click', () => this.phase.userAbort());
-    }    
+  watchSelf() {
+    this.$abort.on('click', () => this.phase.userAbort());
+  }
 
-    appendTo($el) {
-        setTimeout(() => this.showAbortButton(), 10000);
-        return super.appendTo($el);
-    }
+  appendTo($el) {
+    setTimeout(() => this.showAbortButton(), 10000);
+    return super.appendTo($el);
+  }
 
-    showAbortButton() {
-        this.$abort.show();
-        $(this).trigger('change');
-    }
+  showAbortButton() {
+    this.$abort.show();
+    $(this).trigger('change');
+  }
 
 }
 
@@ -79,4 +79,4 @@ initCss(`
 `);
 
 
-export { AttemptWidget };
+export {AttemptWidget};
