@@ -48,7 +48,7 @@ async function useTool() {
 
     else {
         suggestRedirect({
-            message: 'try using this on:\n1) a battle report\n2) a reports folder, with the "Attacks" filter on\n3) a reports folder, with the "Defenses" filter on\';'
+            message: 'try using this on:\n1) a battle report\n2) a reports folder, with the "Attacks" filter on\n3) a reports folder, with the "Defenses" filter on',
             screen: 'report',
             screenName: 'Attacks Report Folder',
             uriParams: {
