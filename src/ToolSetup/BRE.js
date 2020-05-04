@@ -9,6 +9,7 @@ import { ReportsFolderWidget } from '/twcheese/src/Widget/ReportsFolder/ReportsF
 import { userConfig, ensureRemoteConfigsUpdated } from '/twcheese/src/Util/Config.js';
 import { ProcessFactory } from '/twcheese/src/Models/Debug/Build/ProcessFactory.js';
 import { processCfg as debugCfgDefault } from '/twcheese/dist/tool/cfg/debug/BRE/Default.js';
+import { suggestRedirect} from "../Prompt/suggestRedirect";
 
 
 let initialized = false;
@@ -46,7 +47,16 @@ async function useTool() {
     }
 
     else {
-        alert('try using this on:\n1) a battle report\n2) a reports folder, with the "Attacks" filter on\n3) a reports folder, with the "Defenses" filter on');
+        suggestRedirect({
+            message: 'try using this on:\n1) a battle report\n2) a reports folder, with the "Attacks" filter on\n3) a reports folder, with the "Defenses" filter on\';'
+            screen: 'report',
+            screenName: 'Attacks Report Folder',
+            uriParams: {
+                mode: 'attack',
+            },
+            skippableId: 'Tool:BRE'
+        });
+        // alert('try using this on:\n1) a battle report\n2) a reports folder, with the "Attacks" filter on\n3) a reports folder, with the "Defenses" filter on');
     }
 }
 
